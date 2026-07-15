@@ -1,0 +1,524 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "SuperWeb IoT Platform API",
+    "version": "1.0.0",
+    "description": "Kontrak API yang dikonsumsi frontend SuperWeb IoT: CCTV & AI analytics, smart water meter, fleet tracking, power meter, weather station, flood sensor, dan temp/humidity + air quality.\n\n> **Status:** spesifikasi kontrak (interface) frontend ↔ backend. Frontend saat ini masih memakai data mock; dokumen ini menjadi acuan integrasi. Data realtime dikirim via MQTT (lihat `docs/API.md`), tidak tercakup di spec REST ini.",
+    "contact": { "name": "SuperWeb IoT" }
+  },
+  "servers": [
+    { "url": "http://localhost:8000/api/v1", "description": "Local dev (NEXT_PUBLIC_API_URL)" },
+    { "url": "https://api.superweb-iot.id/api/v1", "description": "Produksi" }
+  ],
+  "security": [{ "bearerAuth": [] }],
+  "tags": [
+    { "name": "Auth", "description": "Autentikasi & sesi" },
+    { "name": "CCTV", "description": "Kamera & AI analytics" },
+    { "name": "Water", "description": "Smart water meter" },
+    { "name": "Fleet", "description": "Fleet tracking" },
+    { "name": "Power", "description": "Power meter" },
+    { "name": "Weather", "description": "Weather station" },
+    { "name": "Flood", "description": "Flood smart meter" },
+    { "name": "TempHum", "description": "Temp/humidity & air quality" },
+    { "name": "Cross-module", "description": "Alerts, devices, reports, users" }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": ["Auth"], "summary": "Login", "security": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LoginRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LoginEnvelope" } } } },
+          "401": { "$ref": "#/components/responses/Error" }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": { "tags": ["Auth"], "summary": "Tukar refresh token", "security": [],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LoginEnvelope" } } } }, "401": { "$ref": "#/components/responses/Error" } } }
+    },
+    "/auth/logout": {
+      "post": { "tags": ["Auth"], "summary": "Logout / revoke sesi", "responses": { "204": { "description": "No Content" } } }
+    },
+    "/auth/me": {
+      "get": { "tags": ["Auth"], "summary": "Profil user saat ini",
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserEnvelope" } } } }, "401": { "$ref": "#/components/responses/Error" } } }
+    },
+
+    "/cctv/cameras": {
+      "get": { "tags": ["CCTV"], "summary": "List kamera",
+        "parameters": [ { "$ref": "#/components/parameters/Page" }, { "$ref": "#/components/parameters/PageSize" }, { "$ref": "#/components/parameters/Q" }, { "$ref": "#/components/parameters/Status" }, { "$ref": "#/components/parameters/Zone" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CameraListEnvelope" } } } } } }
+    },
+    "/cctv/cameras/{id}": {
+      "get": { "tags": ["CCTV"], "summary": "Detail kamera", "parameters": [ { "$ref": "#/components/parameters/Id" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CameraEnvelope" } } } }, "404": { "$ref": "#/components/responses/Error" } } }
+    },
+    "/cctv/cameras/{id}/stream-url": {
+      "get": { "tags": ["CCTV"], "summary": "URL stream HLS", "parameters": [ { "$ref": "#/components/parameters/Id" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "object", "properties": { "success": { "type": "boolean" }, "data": { "$ref": "#/components/schemas/StreamUrl" }, "meta": { "$ref": "#/components/schemas/Meta" } } } } } } } }
+    },
+    "/cctv/analytics/people-count": {
+      "get": { "tags": ["CCTV"], "summary": "Ringkasan people counting",
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericObjectEnvelope" } } } } } }
+    },
+    "/cctv/analytics/events": {
+      "get": { "tags": ["CCTV"], "summary": "Log event deteksi", "parameters": [ { "$ref": "#/components/parameters/From" }, { "$ref": "#/components/parameters/To" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericListEnvelope" } } } } } }
+    },
+    "/cctv/analytics/heatmap": {
+      "get": { "tags": ["CCTV"], "summary": "Data heatmap pergerakan",
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericObjectEnvelope" } } } } } }
+    },
+
+    "/water/meters": {
+      "get": { "tags": ["Water"], "summary": "List water meter",
+        "parameters": [ { "$ref": "#/components/parameters/Page" }, { "$ref": "#/components/parameters/PageSize" }, { "$ref": "#/components/parameters/Q" }, { "$ref": "#/components/parameters/Status" }, { "$ref": "#/components/parameters/Zone" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/WaterMeterListEnvelope" } } } } } }
+    },
+    "/water/meters/{id}": {
+      "get": { "tags": ["Water"], "summary": "Detail water meter", "parameters": [ { "$ref": "#/components/parameters/Id" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/WaterMeterEnvelope" } } } }, "404": { "$ref": "#/components/responses/Error" } } }
+    },
+    "/water/meters/{id}/history": {
+      "get": { "tags": ["Water"], "summary": "Data historis meter", "parameters": [ { "$ref": "#/components/parameters/Id" }, { "$ref": "#/components/parameters/From" }, { "$ref": "#/components/parameters/To" }, { "$ref": "#/components/parameters/Interval" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TimeSeriesEnvelope" } } } } } }
+    },
+    "/water/overview": {
+      "get": { "tags": ["Water"], "summary": "Ringkasan (total, avg, top consumers)",
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/WaterOverviewEnvelope" } } } } } }
+    },
+    "/water/leaks": {
+      "get": { "tags": ["Water"], "summary": "Deteksi kebocoran aktif",
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericListEnvelope" } } } } } }
+    },
+    "/water/zones": {
+      "get": { "tags": ["Water"], "summary": "List zona + status",
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericListEnvelope" } } } } } }
+    },
+
+    "/fleet/vehicles": {
+      "get": { "tags": ["Fleet"], "summary": "List kendaraan + posisi terakhir",
+        "parameters": [ { "$ref": "#/components/parameters/Page" }, { "$ref": "#/components/parameters/PageSize" }, { "$ref": "#/components/parameters/Status" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/VehicleListEnvelope" } } } } } }
+    },
+    "/fleet/vehicles/{id}": {
+      "get": { "tags": ["Fleet"], "summary": "Detail kendaraan", "parameters": [ { "$ref": "#/components/parameters/Id" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/VehicleEnvelope" } } } }, "404": { "$ref": "#/components/responses/Error" } } }
+    },
+    "/fleet/vehicles/{id}/trips": {
+      "get": { "tags": ["Fleet"], "summary": "Riwayat perjalanan", "parameters": [ { "$ref": "#/components/parameters/Id" }, { "$ref": "#/components/parameters/From" }, { "$ref": "#/components/parameters/To" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericListEnvelope" } } } } } }
+    },
+    "/fleet/vehicles/{id}/position": {
+      "get": { "tags": ["Fleet"], "summary": "Posisi terkini", "parameters": [ { "$ref": "#/components/parameters/Id" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "object", "properties": { "success": { "type": "boolean" }, "data": { "$ref": "#/components/schemas/Position" }, "meta": { "$ref": "#/components/schemas/Meta" } } } } } } } }
+    },
+    "/fleet/geofences": {
+      "get": { "tags": ["Fleet"], "summary": "List geofence",
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericListEnvelope" } } } } },
+      "post": { "tags": ["Fleet"], "summary": "Buat geofence (admin)",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GeofenceCreate" } } } },
+        "responses": { "201": { "description": "Created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericObjectEnvelope" } } } }, "403": { "$ref": "#/components/responses/Error" } } } }
+    },
+    "/fleet/overview": {
+      "get": { "tags": ["Fleet"], "summary": "Ringkasan KPI armada",
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericObjectEnvelope" } } } } } }
+    },
+
+    "/power/meters": {
+      "get": { "tags": ["Power"], "summary": "List power meter",
+        "parameters": [ { "$ref": "#/components/parameters/Page" }, { "$ref": "#/components/parameters/PageSize" }, { "$ref": "#/components/parameters/Status" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PowerMeterListEnvelope" } } } } } }
+    },
+    "/power/meters/{id}": {
+      "get": { "tags": ["Power"], "summary": "Detail power meter", "parameters": [ { "$ref": "#/components/parameters/Id" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PowerMeterEnvelope" } } } }, "404": { "$ref": "#/components/responses/Error" } } }
+    },
+    "/power/meters/{id}/history": {
+      "get": { "tags": ["Power"], "summary": "Data historis meter", "parameters": [ { "$ref": "#/components/parameters/Id" }, { "$ref": "#/components/parameters/From" }, { "$ref": "#/components/parameters/To" }, { "$ref": "#/components/parameters/Interval" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TimeSeriesEnvelope" } } } } } }
+    },
+    "/power/overview": {
+      "get": { "tags": ["Power"], "summary": "Ringkasan (total, loss, per kategori)",
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericObjectEnvelope" } } } } } }
+    },
+    "/power/quality": {
+      "get": { "tags": ["Power"], "summary": "V, I, Hz, PF real-time",
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericObjectEnvelope" } } } } } }
+    },
+    "/power/cost": {
+      "get": { "tags": ["Power"], "summary": "Estimasi biaya",
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericObjectEnvelope" } } } } } }
+    },
+
+    "/weather/stations": {
+      "get": { "tags": ["Weather"], "summary": "List stasiun cuaca",
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericListEnvelope" } } } } } }
+    },
+    "/weather/stations/{id}/current": {
+      "get": { "tags": ["Weather"], "summary": "Cuaca terkini", "parameters": [ { "$ref": "#/components/parameters/Id" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CurrentWeatherEnvelope" } } } } } }
+    },
+    "/weather/stations/{id}/history": {
+      "get": { "tags": ["Weather"], "summary": "Data historis", "parameters": [ { "$ref": "#/components/parameters/Id" }, { "$ref": "#/components/parameters/From" }, { "$ref": "#/components/parameters/To" }, { "$ref": "#/components/parameters/Interval" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TimeSeriesEnvelope" } } } } } }
+    },
+    "/weather/stations/{id}/forecast": {
+      "get": { "tags": ["Weather"], "summary": "Prakiraan (integrasi BMKG)", "parameters": [ { "$ref": "#/components/parameters/Id" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericListEnvelope" } } } } } }
+    },
+
+    "/flood/sensors": {
+      "get": { "tags": ["Flood"], "summary": "List sensor banjir",
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/FloodSensorListEnvelope" } } } } } }
+    },
+    "/flood/sensors/{id}": {
+      "get": { "tags": ["Flood"], "summary": "Detail + level terkini", "parameters": [ { "$ref": "#/components/parameters/Id" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/FloodSensorEnvelope" } } } }, "404": { "$ref": "#/components/responses/Error" } } }
+    },
+    "/flood/sensors/{id}/history": {
+      "get": { "tags": ["Flood"], "summary": "Historis ketinggian air", "parameters": [ { "$ref": "#/components/parameters/Id" }, { "$ref": "#/components/parameters/From" }, { "$ref": "#/components/parameters/To" }, { "$ref": "#/components/parameters/Interval" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TimeSeriesEnvelope" } } } } } }
+    },
+    "/flood/overview": {
+      "get": { "tags": ["Flood"], "summary": "Status semua sensor",
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericObjectEnvelope" } } } } } }
+    },
+    "/flood/risk-map": {
+      "get": { "tags": ["Flood"], "summary": "Level risiko per area",
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericListEnvelope" } } } } } }
+    },
+
+    "/temphum/sensors": {
+      "get": { "tags": ["TempHum"], "summary": "List sensor",
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TempHumSensorListEnvelope" } } } } } }
+    },
+    "/temphum/sensors/{id}": {
+      "get": { "tags": ["TempHum"], "summary": "Detail + pembacaan terkini", "parameters": [ { "$ref": "#/components/parameters/Id" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TempHumSensorEnvelope" } } } }, "404": { "$ref": "#/components/responses/Error" } } }
+    },
+    "/temphum/sensors/{id}/history": {
+      "get": { "tags": ["TempHum"], "summary": "Data historis", "parameters": [ { "$ref": "#/components/parameters/Id" }, { "$ref": "#/components/parameters/From" }, { "$ref": "#/components/parameters/To" }, { "$ref": "#/components/parameters/Interval" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TimeSeriesEnvelope" } } } } } }
+    },
+    "/temphum/rooms": {
+      "get": { "tags": ["TempHum"], "summary": "List ruangan + status",
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericListEnvelope" } } } } } }
+    },
+    "/temphum/overview": {
+      "get": { "tags": ["TempHum"], "summary": "Ringkasan (AQI, avg temp/hum)",
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericObjectEnvelope" } } } } } }
+    },
+
+    "/alerts": {
+      "get": { "tags": ["Cross-module"], "summary": "List alert (filterable)",
+        "parameters": [
+          { "name": "module", "in": "query", "schema": { "type": "string", "enum": ["cctv", "water", "fleet", "power", "weather", "flood", "temphum", "system"] } },
+          { "name": "severity", "in": "query", "schema": { "type": "string", "enum": ["info", "warning", "critical"] } },
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["active", "acknowledged", "resolved"] } },
+          { "$ref": "#/components/parameters/From" }, { "$ref": "#/components/parameters/To" }, { "$ref": "#/components/parameters/Page" }, { "$ref": "#/components/parameters/PageSize" }
+        ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AlertListEnvelope" } } } } } }
+    },
+    "/alerts/{id}/acknowledge": {
+      "patch": { "tags": ["Cross-module"], "summary": "Acknowledge alert (operator+)", "parameters": [ { "$ref": "#/components/parameters/Id" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AlertEnvelope" } } } }, "403": { "$ref": "#/components/responses/Error" } } }
+    },
+    "/devices": {
+      "get": { "tags": ["Cross-module"], "summary": "Inventaris perangkat",
+        "parameters": [ { "$ref": "#/components/parameters/Page" }, { "$ref": "#/components/parameters/PageSize" }, { "$ref": "#/components/parameters/Status" } ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericListEnvelope" } } } } } }
+    },
+    "/reports/templates": {
+      "get": { "tags": ["Cross-module"], "summary": "Template laporan",
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericListEnvelope" } } } } } }
+    },
+    "/reports/generate": {
+      "post": { "tags": ["Cross-module"], "summary": "Generate laporan (async job)",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ReportGenerate" } } } },
+        "responses": { "202": { "description": "Accepted", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericObjectEnvelope" } } } } } }
+    },
+    "/users": {
+      "get": { "tags": ["Cross-module"], "summary": "List user (admin)",
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericListEnvelope" } } } }, "403": { "$ref": "#/components/responses/Error" } } }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
+    },
+    "parameters": {
+      "Id": { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } },
+      "Page": { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1, "minimum": 1 } },
+      "PageSize": { "name": "pageSize", "in": "query", "schema": { "type": "integer", "default": 20, "maximum": 100 } },
+      "Q": { "name": "q", "in": "query", "schema": { "type": "string" }, "description": "Pencarian teks bebas" },
+      "Status": { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["online", "offline", "error"] } },
+      "Zone": { "name": "zone", "in": "query", "schema": { "type": "string" } },
+      "From": { "name": "from", "in": "query", "schema": { "type": "string", "format": "date-time" } },
+      "To": { "name": "to", "in": "query", "schema": { "type": "string", "format": "date-time" } },
+      "Interval": { "name": "interval", "in": "query", "schema": { "type": "string", "enum": ["raw", "1m", "5m", "1h", "1d"] } }
+    },
+    "responses": {
+      "Error": { "description": "Error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } } }
+    },
+    "schemas": {
+      "Meta": {
+        "type": "object",
+        "properties": {
+          "timestamp": { "type": "string", "format": "date-time" },
+          "pagination": { "$ref": "#/components/schemas/Pagination" }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "page": { "type": "integer", "example": 1 },
+          "pageSize": { "type": "integer", "example": 20 },
+          "total": { "type": "integer", "example": 137 },
+          "totalPages": { "type": "integer", "example": 7 }
+        }
+      },
+      "ErrorEnvelope": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": false },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": { "type": "string", "example": "RESOURCE_NOT_FOUND" },
+              "message": { "type": "string", "example": "Meter tidak ditemukan" }
+            }
+          },
+          "meta": { "$ref": "#/components/schemas/Meta" }
+        }
+      },
+      "GenericObjectEnvelope": {
+        "type": "object",
+        "properties": { "success": { "type": "boolean" }, "data": { "type": "object", "additionalProperties": true }, "meta": { "$ref": "#/components/schemas/Meta" } }
+      },
+      "GenericListEnvelope": {
+        "type": "object",
+        "properties": { "success": { "type": "boolean" }, "data": { "type": "array", "items": { "type": "object", "additionalProperties": true } }, "meta": { "$ref": "#/components/schemas/Meta" } }
+      },
+      "TimeSeriesPoint": {
+        "type": "object",
+        "properties": { "timestamp": { "type": "string", "format": "date-time" }, "value": { "type": "number" } }
+      },
+      "TimeSeriesEnvelope": {
+        "type": "object",
+        "properties": { "success": { "type": "boolean" }, "data": { "type": "array", "items": { "$ref": "#/components/schemas/TimeSeriesPoint" } }, "meta": { "$ref": "#/components/schemas/Meta" } }
+      },
+
+      "LoginRequest": {
+        "type": "object", "required": ["email", "password"],
+        "properties": { "email": { "type": "string", "format": "email", "example": "operator@superweb-iot.id" }, "password": { "type": "string", "format": "password" } }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "usr_01" },
+          "name": { "type": "string", "example": "Budi" },
+          "email": { "type": "string", "format": "email" },
+          "role": { "type": "string", "enum": ["super_admin", "admin", "operator", "viewer"] },
+          "permissions": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "LoginResult": {
+        "type": "object",
+        "properties": {
+          "accessToken": { "type": "string" },
+          "refreshToken": { "type": "string" },
+          "expiresIn": { "type": "integer", "example": 900 },
+          "user": { "$ref": "#/components/schemas/User" }
+        }
+      },
+      "LoginEnvelope": {
+        "type": "object",
+        "properties": { "success": { "type": "boolean" }, "data": { "$ref": "#/components/schemas/LoginResult" }, "meta": { "$ref": "#/components/schemas/Meta" } }
+      },
+      "UserEnvelope": {
+        "type": "object",
+        "properties": { "success": { "type": "boolean" }, "data": { "$ref": "#/components/schemas/User" }, "meta": { "$ref": "#/components/schemas/Meta" } }
+      },
+
+      "Camera": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "cam_01" },
+          "name": { "type": "string", "example": "Lobby Utama" },
+          "zone": { "type": "string", "example": "Gedung A" },
+          "status": { "type": "string", "enum": ["online", "offline", "error"] },
+          "resolution": { "type": "string", "example": "1080p" },
+          "lat": { "type": "number", "example": -6.2088 },
+          "lng": { "type": "number", "example": 106.8456 },
+          "capabilities": { "type": "array", "items": { "type": "string" }, "example": ["people_count", "intrusion", "anpr"] },
+          "lastSeen": { "type": "string", "format": "date-time" }
+        }
+      },
+      "StreamUrl": {
+        "type": "object",
+        "properties": { "url": { "type": "string", "example": "https://cdn.superweb-iot.id/cam_01/index.m3u8" }, "protocol": { "type": "string", "example": "hls" }, "expiresAt": { "type": "string", "format": "date-time" } }
+      },
+      "CameraEnvelope": { "type": "object", "properties": { "success": { "type": "boolean" }, "data": { "$ref": "#/components/schemas/Camera" }, "meta": { "$ref": "#/components/schemas/Meta" } } },
+      "CameraListEnvelope": { "type": "object", "properties": { "success": { "type": "boolean" }, "data": { "type": "array", "items": { "$ref": "#/components/schemas/Camera" } }, "meta": { "$ref": "#/components/schemas/Meta" } } },
+
+      "WaterMeter": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "wm_01" },
+          "name": { "type": "string", "example": "Resto Selera Rakyat" },
+          "zone": { "type": "string", "example": "Jakarta Timur" },
+          "status": { "type": "string", "enum": ["online", "offline", "error"] },
+          "battery": { "type": "integer", "example": 87 },
+          "flowRate": { "type": "number", "example": 3.2 },
+          "totalVolume": { "type": "number", "example": 12840.5 },
+          "unit": { "type": "string", "example": "m3" },
+          "lastReading": { "type": "string", "format": "date-time" }
+        }
+      },
+      "WaterOverview": {
+        "type": "object",
+        "properties": {
+          "totalVolume": { "type": "number", "example": 98230 },
+          "avgDaily": { "type": "number", "example": 4120 },
+          "activeLeaks": { "type": "integer", "example": 2 },
+          "topConsumers": { "type": "array", "items": { "type": "object", "properties": { "id": { "type": "string" }, "name": { "type": "string" }, "usage": { "type": "number" } } } }
+        }
+      },
+      "WaterMeterEnvelope": { "type": "object", "properties": { "success": { "type": "boolean" }, "data": { "$ref": "#/components/schemas/WaterMeter" }, "meta": { "$ref": "#/components/schemas/Meta" } } },
+      "WaterMeterListEnvelope": { "type": "object", "properties": { "success": { "type": "boolean" }, "data": { "type": "array", "items": { "$ref": "#/components/schemas/WaterMeter" } }, "meta": { "$ref": "#/components/schemas/Meta" } } },
+      "WaterOverviewEnvelope": { "type": "object", "properties": { "success": { "type": "boolean" }, "data": { "$ref": "#/components/schemas/WaterOverview" }, "meta": { "$ref": "#/components/schemas/Meta" } } },
+
+      "Position": {
+        "type": "object",
+        "properties": { "lat": { "type": "number", "example": -6.21 }, "lng": { "type": "number", "example": 106.85 }, "speed": { "type": "number", "example": 42 }, "heading": { "type": "number", "example": 135 } }
+      },
+      "Vehicle": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "veh_01" },
+          "plate": { "type": "string", "example": "B 1234 XYZ" },
+          "type": { "type": "string", "example": "truck" },
+          "status": { "type": "string", "enum": ["moving", "idle", "parked", "offline"] },
+          "ignition": { "type": "boolean", "example": true },
+          "fuel": { "type": "integer", "example": 62 },
+          "position": { "$ref": "#/components/schemas/Position" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "GeofenceCreate": {
+        "type": "object", "required": ["name", "type"],
+        "properties": {
+          "name": { "type": "string", "example": "Depot Cakung" },
+          "type": { "type": "string", "enum": ["circle", "polygon"] },
+          "center": { "type": "array", "items": { "type": "number" }, "example": [-6.18, 106.95] },
+          "radius": { "type": "number", "example": 300 }
+        }
+      },
+      "VehicleEnvelope": { "type": "object", "properties": { "success": { "type": "boolean" }, "data": { "$ref": "#/components/schemas/Vehicle" }, "meta": { "$ref": "#/components/schemas/Meta" } } },
+      "VehicleListEnvelope": { "type": "object", "properties": { "success": { "type": "boolean" }, "data": { "type": "array", "items": { "$ref": "#/components/schemas/Vehicle" } }, "meta": { "$ref": "#/components/schemas/Meta" } } },
+
+      "PowerMeter": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "pm_01" },
+          "name": { "type": "string", "example": "Panel Gedung A" },
+          "status": { "type": "string", "enum": ["online", "offline", "error"] },
+          "voltage": { "type": "number", "example": 220.4 },
+          "current": { "type": "number", "example": 18.7 },
+          "power": { "type": "number", "example": 4.1 },
+          "energy": { "type": "number", "example": 15230.8 },
+          "powerFactor": { "type": "number", "example": 0.98 },
+          "frequency": { "type": "number", "example": 50.0 },
+          "unit": { "type": "string", "example": "kWh" },
+          "lastReading": { "type": "string", "format": "date-time" }
+        }
+      },
+      "PowerMeterEnvelope": { "type": "object", "properties": { "success": { "type": "boolean" }, "data": { "$ref": "#/components/schemas/PowerMeter" }, "meta": { "$ref": "#/components/schemas/Meta" } } },
+      "PowerMeterListEnvelope": { "type": "object", "properties": { "success": { "type": "boolean" }, "data": { "type": "array", "items": { "$ref": "#/components/schemas/PowerMeter" } }, "meta": { "$ref": "#/components/schemas/Meta" } } },
+
+      "CurrentWeather": {
+        "type": "object",
+        "properties": {
+          "stationId": { "type": "string", "example": "ws_01" },
+          "temperature": { "type": "number", "example": 31.2 },
+          "humidity": { "type": "number", "example": 74 },
+          "windSpeed": { "type": "number", "example": 3.4 },
+          "windDirection": { "type": "number", "example": 210 },
+          "rainfall": { "type": "number", "example": 0.0 },
+          "pressure": { "type": "number", "example": 1009.2 },
+          "condition": { "type": "string", "example": "cerah_berawan" },
+          "observedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "CurrentWeatherEnvelope": { "type": "object", "properties": { "success": { "type": "boolean" }, "data": { "$ref": "#/components/schemas/CurrentWeather" }, "meta": { "$ref": "#/components/schemas/Meta" } } },
+
+      "FloodSensor": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "fs_01" },
+          "name": { "type": "string", "example": "Pintu Air Manggarai" },
+          "status": { "type": "string", "enum": ["online", "offline", "error"] },
+          "battery": { "type": "integer", "example": 91 },
+          "waterLevelCm": { "type": "number", "example": 180 },
+          "rateOfRise": { "type": "number", "example": 4.5 },
+          "alertLevel": { "type": "string", "enum": ["normal", "waspada", "siaga", "bahaya"] },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "FloodSensorEnvelope": { "type": "object", "properties": { "success": { "type": "boolean" }, "data": { "$ref": "#/components/schemas/FloodSensor" }, "meta": { "$ref": "#/components/schemas/Meta" } } },
+      "FloodSensorListEnvelope": { "type": "object", "properties": { "success": { "type": "boolean" }, "data": { "type": "array", "items": { "$ref": "#/components/schemas/FloodSensor" } }, "meta": { "$ref": "#/components/schemas/Meta" } } },
+
+      "TempHumSensor": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "th_01" },
+          "name": { "type": "string", "example": "Server Room 1" },
+          "room": { "type": "string", "example": "Data Center" },
+          "status": { "type": "string", "enum": ["online", "offline", "error"] },
+          "battery": { "type": "integer", "example": 100 },
+          "temperature": { "type": "number", "example": 22.4 },
+          "humidity": { "type": "number", "example": 45 },
+          "aqi": { "type": "number", "example": 38 },
+          "pm25": { "type": "number", "example": 9 },
+          "co2": { "type": "number", "example": 620 },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "TempHumSensorEnvelope": { "type": "object", "properties": { "success": { "type": "boolean" }, "data": { "$ref": "#/components/schemas/TempHumSensor" }, "meta": { "$ref": "#/components/schemas/Meta" } } },
+      "TempHumSensorListEnvelope": { "type": "object", "properties": { "success": { "type": "boolean" }, "data": { "type": "array", "items": { "$ref": "#/components/schemas/TempHumSensor" } }, "meta": { "$ref": "#/components/schemas/Meta" } } },
+
+      "Alert": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "alr_01" },
+          "module": { "type": "string", "enum": ["cctv", "water", "fleet", "power", "weather", "flood", "temphum", "system"] },
+          "sourceId": { "type": "string", "example": "fs_01" },
+          "severity": { "type": "string", "enum": ["info", "warning", "critical"] },
+          "status": { "type": "string", "enum": ["active", "acknowledged", "resolved"] },
+          "title": { "type": "string", "example": "Ketinggian air BAHAYA di Pintu Air Manggarai" },
+          "value": { "type": "number", "example": 210 },
+          "threshold": { "type": "number", "example": 200 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "acknowledgedAt": { "type": ["string", "null"], "format": "date-time" }
+        }
+      },
+      "AlertEnvelope": { "type": "object", "properties": { "success": { "type": "boolean" }, "data": { "$ref": "#/components/schemas/Alert" }, "meta": { "$ref": "#/components/schemas/Meta" } } },
+      "AlertListEnvelope": { "type": "object", "properties": { "success": { "type": "boolean" }, "data": { "type": "array", "items": { "$ref": "#/components/schemas/Alert" } }, "meta": { "$ref": "#/components/schemas/Meta" } } },
+
+      "ReportGenerate": {
+        "type": "object", "required": ["templateId"],
+        "properties": {
+          "templateId": { "type": "string", "example": "rpt_daily_water" },
+          "from": { "type": "string", "format": "date-time" },
+          "to": { "type": "string", "format": "date-time" },
+          "format": { "type": "string", "enum": ["pdf", "xlsx"], "example": "pdf" }
+        }
+      }
+    }
+  }
+}
