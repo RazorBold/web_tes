@@ -25,7 +25,7 @@ export default function EnergyCategory() {
       formatter: "{b}: {c} MWh ({d}%)",
       textStyle: {
         fontFamily: "Inter, sans-serif",
-        fontSize: 11,
+        fontSize: 13,
       },
     },
     color: categories.map((c) => c.color),
@@ -58,7 +58,7 @@ export default function EnergyCategory() {
   return (
     <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col h-[220px]">
       {/* Header */}
-      <h3 className="font-bold text-slate-800 text-[11px] tracking-wider uppercase border-b border-slate-100 pb-2">
+      <h3 className="font-bold text-slate-800 text-[13px] tracking-wider uppercase border-b border-slate-100 pb-2">
         Energy By Category
       </h3>
 
@@ -68,13 +68,13 @@ export default function EnergyCategory() {
         <div className="relative w-[104px] h-[104px] flex-shrink-0">
           <BaseChart option={option} className="w-full h-full" />
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center leading-none">
-            <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wide">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">
               Total
             </span>
-            <span className="text-[13px] font-extrabold text-slate-800 font-mono mt-1">
+            <span className="text-[14px] font-extrabold text-slate-800 font-mono mt-1">
               6,759
             </span>
-            <span className="text-[8px] font-bold text-slate-500 mt-0.5">MWh</span>
+            <span className="text-[11px] font-bold text-slate-500 mt-0.5">MWh</span>
           </div>
         </div>
 
@@ -90,16 +90,16 @@ export default function EnergyCategory() {
 
               {/* Name + MWh stacked */}
               <div className="min-w-0 flex-1 leading-tight">
-                <span className="block text-[11px] font-bold text-slate-700 truncate">
+                <span className="block text-[13px] font-bold text-slate-700 truncate">
                   {item.name}
                 </span>
-                <span className="block text-[9px] font-semibold text-slate-400 font-mono">
+                <span className="block text-[11px] font-semibold text-slate-400 font-mono">
                   {item.value.toLocaleString("en-US")} MWh
                 </span>
               </div>
 
               {/* Percentage */}
-              <span className="text-[11px] font-extrabold text-slate-800 font-mono flex-shrink-0">
+              <span className="text-[13px] font-extrabold text-slate-800 font-mono flex-shrink-0">
                 {item.percentage}%
               </span>
             </div>

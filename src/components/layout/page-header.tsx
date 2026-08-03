@@ -23,7 +23,7 @@ export default function PageHeader({
             {title}
           </h1>
         </div>
-        <p className="text-[12px] text-slate-500 font-medium mt-1.5 ml-[30px]">{subtitle}</p>
+        <p className="text-[14px] text-slate-500 font-medium mt-1.5 ml-[30px]">{subtitle}</p>
       </div>
       {right && <div className="flex items-center gap-2 ml-[30px] md:ml-0">{right}</div>}
     </div>

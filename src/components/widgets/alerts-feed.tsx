@@ -15,70 +15,70 @@ const initialAlerts: AlertItem[] = [
   {
     id: "1",
     title: "Power Meter Offline",
-    location: "MTR-PWR-04 · Gedung B",
+    location: "Energy · Sub-Panel Distribusi Thamrin",
     time: "11:12",
     severity: "critical",
   },
   {
     id: "2",
-    title: "High Water Level",
-    location: "Flood · Titik D (Bahaya)",
+    title: "Ketinggian Air Bahaya",
+    location: "Flood · Pintu Air Angke Hulu (Siaga I — Bahaya)",
     time: "11:05",
     severity: "critical",
   },
   {
     id: "3",
     title: "Penyusupan Area Vital",
-    location: "CCTV · People Surveillance",
+    location: "CCTV · 08. Area Genset/PLN",
     time: "11:01",
     severity: "critical",
   },
   {
     id: "4",
-    title: "Water Meter Offline",
-    location: "Cikondang",
+    title: "Ketinggian Air Waspada",
+    location: "Flood · Pintu Air Manggarai (Siaga II — Waspada)",
     time: "10:58",
     severity: "warning",
   },
   {
     id: "5",
-    title: "Overspeed Detected",
-    location: "Fleet · Toyota Hilux (B 5432 LPT)",
+    title: "Overspeed Terdeteksi",
+    location: "Fleet · Toyota Avanza (B 2291 TTT)",
     time: "10:47",
     severity: "warning",
   },
   {
     id: "6",
-    title: "Server Room Temp High",
-    location: "TempHum · 29.4°C",
+    title: "Suhu Ruang Panel Tinggi",
+    location: "Environment · Ruang Panel 31,2°C",
     time: "10:33",
     severity: "warning",
   },
   {
     id: "7",
-    title: "Camera Offline",
-    location: "CCTV · 04. Koridor Lt.1",
+    title: "Kamera Offline",
+    location: "CCTV · 04. Koridor Lt. 1",
     time: "10:20",
     severity: "info",
   },
   {
     id: "8",
     title: "Batasan Area Dilanggar",
-    location: "CCTV · People Surveillance",
+    location: "CCTV · 05. Pintu Barat In",
     time: "10:15",
     severity: "warning",
   },
   {
     id: "9",
     title: "Pintu Terbuka Terlalu Lama",
-    location: "CCTV · Ruang Kontrol",
+    location: "CCTV · 06. Loading Dock C",
     time: "10:05",
     severity: "info",
   },
   {
     id: "10",
     title: "Overcurrent Detected",
-    location: "MTR-PWR-02 · Gardu 3",
+    location: "Energy · Gardu Hub Gatot Subroto",
     time: "09:55",
     severity: "warning",
   },
@@ -112,12 +112,12 @@ export default function AlertsFeed() {
     <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col justify-between h-[220px]">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-        <h3 className="font-bold text-slate-800 text-[11px] tracking-wider uppercase">
+        <h3 className="font-bold text-slate-800 text-[13px] tracking-wider uppercase">
           Alerts
         </h3>
         <a
           href="/alerts"
-          className="text-[10px] font-bold text-brand-red hover:text-brand-red-hover transition-colors flex items-center gap-0.5"
+          className="text-[12px] font-bold text-brand-red hover:text-brand-red-hover transition-colors flex items-center gap-0.5"
         >
           Lihat Semua <ChevronRight className="h-3 w-3" />
         </a>
@@ -138,12 +138,12 @@ export default function AlertsFeed() {
                   <span className="font-extrabold text-slate-800 block leading-tight">
                     {alert.title}
                   </span>
-                  <span className="text-[9px] font-semibold text-slate-400 block mt-0.5">
+                  <span className="text-[11px] font-semibold text-slate-400 block mt-0.5">
                     {alert.location}
                   </span>
                 </div>
               </div>
-              <span className="font-bold text-slate-500 font-mono text-[10px] flex-shrink-0">
+              <span className="font-bold text-slate-500 font-mono text-[12px] flex-shrink-0">
                 {alert.time}
               </span>
             </div>

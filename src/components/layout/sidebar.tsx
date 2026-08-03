@@ -49,8 +49,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 export default function Sidebar() {
   const pathname = usePathname();
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
-    Sensors: true,
-    Environment: true,
+    "Sensor IoT": true,
   });
 
   const toggleMenu = (label: string) =>
@@ -76,12 +75,33 @@ export default function Sidebar() {
       {/* Navigation List */}
       <nav className="flex-1 px-3 py-4 space-y-1">
         {navigation.map((item, index) => {
+          if (item.hidden) return null;
+
           if (item.type === "divider") {
             return <hr key={`div-${index}`} className="my-3 border-slate-100" />;
           }
 
+          if (item.type === "header") {
+            return (
+              <div
+                key={`hdr-${index}`}
+                className="px-3 pt-4 pb-1 text-[12px] font-bold uppercase tracking-widest text-slate-400"
+              >
+                {item.label}
+              </div>
+            );
+          }
+
           const isOpen = openMenus[item.label || ""] ?? false;
-          const isActive = pathname === item.href;
+          // Cocok persis, ATAU berada di bawah `activePrefix` bila menu itu punya
+          // beberapa halaman setara. CCTV & AI menunjuk ke /cctv/v1 tapi harus
+          // tetap menyala di /cctv/v2 — tanpa ini menunya padam begitu varian
+          // lain dibuka. Awalannya ditulis eksplisit di konfigurasi, bukan
+          // disimpulkan dari href, supaya menu lain tidak ikut kena aturan ini.
+          const isActive =
+            pathname === item.href ||
+            (!!item.activePrefix &&
+              (pathname === item.activePrefix || pathname.startsWith(`${item.activePrefix}/`)));
 
           if (item.collapsible) {
             return (
@@ -111,7 +131,7 @@ export default function Sidebar() {
                         <Link
                           key={child.label}
                           href={child.href}
-                          className={`flex items-center gap-3 px-3 py-1.5 text-[13px] font-medium rounded-lg transition-colors ${
+                          className={`flex items-center gap-3 px-3 py-1.5 text-[14px] font-medium rounded-lg transition-colors ${
                             isChildActive
                               ? "bg-red-50 text-brand-red"
                               : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
@@ -151,7 +171,7 @@ export default function Sidebar() {
                 <span>{item.label}</span>
               </div>
               {item.badge && (
-                <span className="bg-brand-red text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                <span className="bg-brand-red text-white text-[12px] font-bold px-2 py-0.5 rounded-full">
                   {item.badge}
                 </span>
               )}
@@ -171,7 +191,7 @@ export default function Sidebar() {
             <br />
             Buatan Indonesia
           </h4>
-          <p className="text-[11px] text-white/80 mt-2 relative">
+          <p className="text-[13px] text-white/80 mt-2 relative">
             Menuju Indonesia Smart &amp; Digital
           </p>
         </div>
@@ -183,14 +203,14 @@ export default function Sidebar() {
             <span className="absolute h-2.5 w-2.5 bg-emerald-500 rounded-full animate-ping opacity-40" />
           </div>
           <div className="leading-tight">
-            <h5 className="font-bold text-[12px] text-slate-800">System Status</h5>
-            <span className="text-[11px] text-emerald-600 font-semibold">All System Operational</span>
+            <h5 className="font-bold text-[14px] text-slate-800">System Status</h5>
+            <span className="text-[13px] text-emerald-600 font-semibold">All System Operational</span>
           </div>
         </div>
 
         <div className="text-center px-1 leading-tight">
-          <p className="text-[10px] text-slate-400">&copy; 2026 Nusantara IoT Platform</p>
-          <p className="text-[9px] text-slate-400 mt-0.5">
+          <p className="text-[12px] text-slate-400">&copy; 2026 Merah Putih IoT Platform</p>
+          <p className="text-[11px] text-slate-400 mt-0.5">
             Edited by <span className="font-bold text-brand-red">PT Telkom Indonesia</span>
           </p>
         </div>

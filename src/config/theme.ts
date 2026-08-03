@@ -2,7 +2,7 @@
 export const colors = {
   // Brand — Merah Putih
   primary: {
-    50:  '#FEF2F2',
+    50: '#FEF2F2',
     100: '#FEE2E2',
     200: '#FECACA',
     300: '#FCA5A5',
@@ -38,76 +38,91 @@ export const colors = {
   // Semantic
   success: '#22C55E',    // Normal, online, healthy
   warning: '#F97316',    // Waspada, idle, attention needed
-  danger:  '#EF4444',    // Bahaya, critical, offline
-  info:    '#3B82F6',    // Informational
+  danger: '#EF4444',    // Bahaya, critical, offline
+  info: '#3B82F6',    // Informational
 
   // Flood Level Colors
   flood: {
-    normal:  '#22C55E',  // < 50cm
+    normal: '#22C55E',  // < 50cm
     waspada: '#EAB308',  // 50-100cm
-    siaga:   '#F97316',  // 100-150cm
-    bahaya:  '#EF4444',  // > 150cm
+    siaga: '#F97316',  // 100-150cm
+    bahaya: '#EF4444',  // > 150cm
   },
 };
 
-export const roomThresholds = {
-  server_room:  { temp: [18, 27], humidity: [30, 60] },
-  warehouse:    { temp: [15, 35], humidity: [30, 70] },
-  office:       { temp: [20, 28], humidity: [40, 65] },
-  cold_storage: { temp: [-5, 5],  humidity: [80, 95] },
-  lab:          { temp: [18, 25], humidity: [35, 55] },
+export type NavItem = {
+  label?: string;
+  icon?: string;
+  href?: string;
+  badge?: string;
+  type?: 'divider' | 'header';
+  collapsible?: boolean;
+  children?: { label: string; icon: string; href: string }[];
+  /**
+   * Awalan alamat yang ikut membuat menu ini menyala, selain `href` itu sendiri.
+   *
+   * Dipakai menu yang punya beberapa halaman setara: CCTV & AI menunjuk langsung
+   * ke /cctv/v1, tapi menunya harus tetap menyala saat /cctv/v2 dibuka.
+   */
+  activePrefix?: string;
+  /**
+   * Sembunyikan dari sidebar tanpa menghapus entrinya.
+   *
+   * Halamannya TETAP HIDUP dan bisa dibuka lewat alamatnya langsung — yang
+   * hilang hanya tautannya. Dipakai untuk menu yang sedang tidak ingin
+   * ditampilkan tapi belum tentu dibuang, supaya menghidupkannya kembali cukup
+   * menghapus satu baris, bukan menyusun ulang entrinya dari ingatan.
+   */
+  hidden?: boolean;
 };
 
-export const navigation = [
+export const navigation: NavItem[] = [
+  // 1. Dashboard — overview semua data: CCTV + Sensor + Tracking.
+  //
+  // Disembunyikan 2026-08-03 atas permintaan pemakai. Halamannya tetap hidup di
+  // "/" dan tetap ikut ter-build; yang hilang cuma tautannya di sidebar. Hapus
+  // baris `hidden` untuk menampilkannya lagi.
   {
     label: 'Dashboard',
     icon: 'LayoutDashboard',
     href: '/',
+    hidden: true,
   },
+  // 2. CCTV & AI — fokus kamera & AI, menu utama terpisah.
+  //
+  // Menunjuk LANGSUNG ke varian yang dipakai, bukan ke /cctv. Lewat /cctv,
+  // kliknya melewati pengalihan; kalau kebetulan sudah berada di varian tujuan,
+  // pengalihan itu mendarat di halaman yang sama sehingga menunya terasa mati
+  // ditekan. Untuk mengunci varian lain, ganti baris href di bawah ini.
   {
-    label: 'Live Monitoring',
-    icon: 'Monitor',
-    href: '/live',
+    label: 'CCTV & AI',
+    icon: 'Camera',
+    href: '/cctv/v1',
+    activePrefix: '/cctv',
   },
+  // 3. IoT Dashboard Platform — analitik lintas modul, menu utama terpisah
   {
-    label: 'Sensors',
+    label: 'IoT Dashboard Platform',
+    icon: 'BarChart3',
+    href: '/analytics',
+  },
+  // 4. Sensor IoT — semua sensor + tracking (tanpa CCTV/AI), dalam 1 menu collapsible
+  {
+    label: 'Sensor IoT',
     icon: 'Cpu',
     collapsible: true,
     children: [
       { label: 'Water', icon: 'Droplets', href: '/water' },
       { label: 'Energy', icon: 'Zap', href: '/power' },
-    ],
-  },
-  {
-    label: 'Fleet Tracking',
-    icon: 'Truck',
-    href: '/fleet',
-  },
-  {
-    label: 'CCTV & AI',
-    icon: 'Camera',
-    href: '/cctv',
-  },
-  {
-    label: 'Environment',
-    icon: 'Leaf',
-    collapsible: true,
-    children: [
-      { label: 'Weather', icon: 'CloudSun', href: '/weather' },
+      { label: 'Fleet Tracking', icon: 'Truck', href: '/fleet' },
       { label: 'Flood', icon: 'Waves', href: '/flood' },
-      { label: 'TempHum', icon: 'ThermometerSun', href: '/temphum' },
+      { label: 'Weather', icon: 'CloudSun', href: '/weather' },
+      { label: 'Environment', icon: 'ThermometerSun', href: '/temphum' },
     ],
-  },
-  {
-    label: 'Analytics',
-    icon: 'BarChart3',
-    href: '/analytics',
   },
   { type: 'divider' },
   { label: 'Alert Center', icon: 'Bell', href: '/alerts', badge: '5' },
   { label: 'Reports', icon: 'FileText', href: '/reports' },
   { label: 'Devices', icon: 'HardDrive', href: '/devices' },
-  { label: 'Integrations', icon: 'Plug', href: '/settings/integrations' },
-  { label: 'API Docs', icon: 'FileText', href: '/api-docs' },
   { label: 'Settings', icon: 'Settings', href: '/settings' },
 ];

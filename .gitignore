@@ -40,3 +40,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Koleksi Postman NVR — memuat secret JWT, jangan ikut ter-commit
+APIGETDATA_CCTVAI.json
+
+# Gambar heatmap hasil render — dibangun ulang dari NVR, tidak perlu di-commit
+/data/
+
+# Proyek rujukan pihak ketiga (punya .git sendiri di dalamnya, jadi kalau
+# di-commit hanya jadi gitlink kosong yang tidak bisa di-clone siapa pun).
+# Dipakai untuk mempelajari protokol NVR, bukan bagian dari aplikasi.
+/contoh_getdata_cctv/
+/heatmap-aibox-icode-1/

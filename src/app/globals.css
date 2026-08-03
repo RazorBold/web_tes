@@ -1,6 +1,16 @@
 @import "tailwindcss";
 
 @theme {
+  /* Skala teks dinaikkan satu tingkat agar terbaca pada rasio layar lebar yang
+     dipakai untuk display. Ini menggeser SEMUA pemakaian text-xs / text-sm
+     sekaligus tanpa menyentuh ratusan file; ukuran arbitrer (text-[11px] dst.)
+     sudah dinaikkan langsung di komponennya. text-base ke atas dibiarkan —
+     sudah terbaca. */
+  --text-xs: 14px;
+  --text-xs--line-height: 1.4;
+  --text-sm: 15px;
+  --text-sm--line-height: 1.45;
+
   --color-brand-red: #DC2626;
   --color-brand-red-light: #FEF2F2;
   --color-brand-red-hover: #B91C1C;
@@ -14,6 +24,33 @@
   --animate-radar-beam: radar-beam 4s linear infinite;
   --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-scan: scan 3s ease-in-out infinite;
+
+  /* Panel AI Telkom: muncul dari arah tombol mascot (kanan-bawah) */
+  --animate-pop-in: pop-in 0.34s cubic-bezier(0.16, 1, 0.3, 1);
+  /* Gelembung chat baru & chip saran */
+  --animate-bubble-in: bubble-in 0.24s ease-out;
+
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: translateY(18px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes bubble-in {
+    from {
+      opacity: 0;
+      transform: translateY(7px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
   @keyframes radar-beam {
     from {
@@ -83,6 +120,49 @@ body {
   height: 100%;
   border-radius: 8px;
   z-index: 1;
+  background: #EEF2F6;
+  font-family: var(--font-sans);
+}
+
+/* Toned-down basemap so the coloured vehicle markers read first */
+.map-soft .leaflet-tile-pane {
+  filter: saturate(0.7) brightness(1.04) contrast(0.94);
+}
+
+/* Preview map embedded in a card: decorative only, clicks belong to the card */
+.map-static .leaflet-container {
+  pointer-events: none;
+}
+
+/* Pulse halo behind a vehicle marker (raw CSS — not a Tailwind utility) */
+@keyframes vehicle-ping {
+  75%,
+  100% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 14px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 12px 30px -12px rgba(15, 23, 42, 0.28);
+}
+
+.leaflet-popup-content {
+  margin: 10px 12px;
+}
+
+.leaflet-control-zoom a {
+  border-radius: 8px !important;
+  color: #475569 !important;
+  border-color: rgba(226, 232, 240, 0.9) !important;
+}
+
+.leaflet-control-attribution {
+  font-size: 9px;
+  background: rgba(255, 255, 255, 0.75) !important;
+  border-radius: 6px 0 0 0;
 }
 
 /* Glassmorphism styling helpers */

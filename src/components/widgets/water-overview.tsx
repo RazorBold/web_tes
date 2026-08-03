@@ -8,10 +8,10 @@ export default function WaterOverview() {
     <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col justify-between h-[220px] group">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-        <h3 className="font-bold text-slate-800 text-[11px] tracking-wider uppercase">
+        <h3 className="font-bold text-slate-800 text-[13px] tracking-wider uppercase">
           Water Overview
         </h3>
-        <span className="text-[10px] font-bold text-slate-400">This Month</span>
+        <span className="text-[12px] font-bold text-slate-400">This Month</span>
       </div>
 
       {/* Main Split Content */}
@@ -19,7 +19,7 @@ export default function WaterOverview() {
         {/* Left Column: Data */}
         <div className="flex-1 flex flex-col justify-between h-full">
           <div>
-            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wide leading-none">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wide leading-none">
               Total Usage
             </span>
             <h4 className="text-2xl font-extrabold text-slate-800 tracking-tight leading-none mt-1.5 flex items-baseline gap-0.5">
@@ -28,18 +28,18 @@ export default function WaterOverview() {
             
             {/* Trend info in single clean line (no outline badge) */}
             <div className="flex items-center gap-1 mt-1.5 leading-none">
-              <span className="text-[10px] font-extrabold text-emerald-500 flex items-center">
+              <span className="text-[12px] font-extrabold text-emerald-500 flex items-center">
                 <ArrowUp className="h-3.5 w-3.5" />
                 6.2%
               </span>
-              <span className="text-[9px] font-bold text-slate-500">
+              <span className="text-[11px] font-bold text-slate-500">
                 vs last month
               </span>
             </div>
           </div>
 
           <div className="border-t border-slate-100 pt-2 mt-2">
-            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wide leading-none block">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wide leading-none block">
               Daily Average
             </span>
             <span className="text-xs font-extrabold text-slate-700 tracking-tight block mt-1">

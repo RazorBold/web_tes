@@ -3,20 +3,23 @@
 import React from "react";
 import BaseChart from "@/components/charts/base-chart";
 import { Zap, ArrowUpRight, Award, Clock } from "lucide-react";
+import { usePowerOverview } from "@/hooks/use-power";
 
 export default function TotalEnergyWidget() {
+  const { data: overview } = usePowerOverview();
+
   const chartOption = {
     grid: { left: "3%", right: "3%", bottom: "3%", top: "12%", containLabel: true },
     xAxis: {
       type: "category",
       boundaryGap: false,
-      data: ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"],
-      axisLabel: { fontFamily: "Inter, sans-serif", fontSize: 9, color: "#94A3B8" },
+      data: (overview?.loadCurve ?? []).map((c) => c.hour),
+      axisLabel: { fontFamily: "Inter, sans-serif", fontSize: 11, color: "#94A3B8" },
       axisLine: { lineStyle: { color: "#E2E8F0" } },
     },
     yAxis: {
       type: "value",
-      axisLabel: { fontFamily: "Inter, sans-serif", fontSize: 9, color: "#94A3B8" },
+      axisLabel: { fontFamily: "Inter, sans-serif", fontSize: 11, color: "#94A3B8" },
       splitLine: { lineStyle: { color: "#F1F5F9" } },
     },
     tooltip: {
@@ -24,12 +27,12 @@ export default function TotalEnergyWidget() {
       backgroundColor: "rgba(255, 255, 255, 0.95)",
       borderColor: "#E2E8F0",
       borderWidth: 1,
-      textStyle: { color: "#1E293B", fontSize: 11 },
+      textStyle: { color: "#1E293B", fontSize: 13 },
     },
     series: [
       {
-        name: "Hari Ini",
-        data: [820, 930, 901, 934, 1290, 1330, 1320],
+        name: "Beban Hari Ini",
+        data: (overview?.loadCurve ?? []).map((c) => c.powerKw),
         type: "line",
         smooth: true,
         symbol: "none",
@@ -45,25 +48,17 @@ export default function TotalEnergyWidget() {
           },
         },
       },
-      {
-        name: "Rata-rata",
-        data: [750, 800, 850, 820, 950, 1000, 980],
-        type: "line",
-        smooth: true,
-        symbol: "none",
-        lineStyle: { color: "#94A3B8", width: 1.5, type: "dashed" },
-      },
     ],
   };
 
-  const categories = [
-    { name: "Sektor Industri", value: "3,115 MWh", pct: "46%", trend: "+2.1%" },
-    { name: "Sektor Komersial", value: "2,365 MWh", pct: "35%", trend: "+1.5%" },
-    { name: "Sektor Residensial", value: "1,279 MWh", pct: "19%", trend: "-0.8%" },
-  ];
+  const categories = overview?.sectors.map((s) => ({
+    name: `Sektor ${s.sector.charAt(0).toUpperCase()}${s.sector.slice(1)}`,
+    value: `${s.energy.toLocaleString("id-ID")} MWh`,
+    pct: `${s.pct}%`,
+  })) ?? [];
 
   return (
-    <div className="bg-white/45 backdrop-blur-md border border-white/70 rounded-2xl p-5 shadow-sm flex flex-col h-[420px]">
+    <div className="bg-white/60 backdrop-blur-md border border-slate-300/80 rounded-2xl p-5 shadow-sm flex flex-col h-[420px]">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-200/70 pb-3">
         <div className="flex items-center gap-2.5">
@@ -72,12 +67,12 @@ export default function TotalEnergyWidget() {
           </div>
           <div>
             <h3 className="font-bold text-slate-800 text-base leading-none">Total Energi</h3>
-            <p className="text-[10px] text-slate-400 font-semibold mt-1">Konsumsi beban &amp; profil sektor</p>
+            <p className="text-[12px] text-slate-400 font-semibold mt-1">Konsumsi beban &amp; profil sektor</p>
           </div>
         </div>
-        <span className="flex items-center gap-0.5 text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded px-1.5 py-0.5">
+        <span className="flex items-center gap-0.5 text-[11px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded px-1.5 py-0.5">
           <ArrowUpRight className="h-3 w-3" />
-          +1.8%
+          {overview ? `${overview.totalEnergy.toLocaleString("id-ID")} MWh` : "—"}
         </span>
       </div>
 
@@ -86,15 +81,19 @@ export default function TotalEnergyWidget() {
         <div className="bg-slate-50/50 border border-slate-100 rounded-xl p-3 flex items-center gap-2.5">
           <Clock className="h-4 w-4 text-amber-500" />
           <div className="leading-tight">
-            <span className="text-[8.5px] font-bold text-slate-400 block uppercase">Beban Puncak</span>
-            <span className="text-xs font-extrabold text-slate-700">1,290 kW (Jum)</span>
+            <span className="text-[11px] font-bold text-slate-400 block uppercase">Beban Puncak</span>
+            <span className="text-xs font-extrabold text-slate-700">
+              {overview ? `${overview.peakLoadKw.toLocaleString("id-ID")} kW (${overview.peakLoadAt})` : "—"}
+            </span>
           </div>
         </div>
         <div className="bg-slate-50/50 border border-slate-100 rounded-xl p-3 flex items-center gap-2.5">
           <Award className="h-4 w-4 text-emerald-500" />
           <div className="leading-tight">
-            <span className="text-[8.5px] font-bold text-slate-400 block uppercase">Faktor Daya</span>
-            <span className="text-xs font-extrabold text-slate-700">0.96 (Optimal)</span>
+            <span className="text-[11px] font-bold text-slate-400 block uppercase">Faktor Daya</span>
+            <span className="text-xs font-extrabold text-slate-700">
+              {overview ? `${overview.avgPowerFactor} (${overview.avgPowerFactor >= 0.95 ? "Optimal" : "Perlu Perbaikan"})` : "—"}
+            </span>
           </div>
         </div>
       </div>
@@ -107,14 +106,14 @@ export default function TotalEnergyWidget() {
       {/* Categories table */}
       <div className="mt-2.5 pt-2 border-t border-slate-100 space-y-1.5">
         {categories.map((c, i) => (
-          <div key={i} className="flex justify-between items-center text-[10.5px]">
+          <div key={i} className="flex justify-between items-center text-[12px]">
             <div className="flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
               <span className="font-bold text-slate-600">{c.name}</span>
             </div>
             <div className="flex items-center gap-3 font-mono font-bold text-slate-700">
               <span>{c.value}</span>
-              <span className="text-slate-400 text-[9.5px]">({c.pct})</span>
+              <span className="text-slate-400 text-[11px]">({c.pct})</span>
             </div>
           </div>
         ))}

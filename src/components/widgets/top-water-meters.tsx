@@ -1,38 +1,39 @@
 "use client";
 
+import { RETENTION_LABEL } from "@/config/retention";
 import React from "react";
-import { ChevronRight } from "lucide-react";
+import { Droplets, ChevronRight } from "lucide-react";
+import { useWaterOverview } from "@/hooks/use-water";
 
-interface WaterMeterRank {
-  rank: number;
-  name: string;
-  value: number;
-}
-
-const ranks: WaterMeterRank[] = [
-  { rank: 1, name: "PT. Sinar Abadi Utama", value: 540 },
-  { rank: 2, name: "Mall Nusantara Plaza", value: 485 },
-  { rank: 3, name: "Hotel Sentosa Indah", value: 410 },
-  { rank: 4, name: "Apartemen Green Garden", value: 390 },
-  { rank: 5, name: "Larang Prabu 3", value: 355 },
-  { rank: 6, name: "Loka Citra Utama", value: 321 },
-  { rank: 7, name: "Resto Selera Rakyat", value: 315 },
-  { rank: 8, name: "Larang Prabu 2", value: 289 },
-  { rank: 9, name: "RS Medika Nusantara", value: 265 },
-  { rank: 10, name: "Cikondang Jaya", value: 103 },
-];
+const rankStyle = (i: number) =>
+  i === 0
+    ? "bg-amber-500/10 text-amber-600 ring-2 ring-amber-500/20"
+    : i === 1
+    ? "bg-slate-400/10 text-slate-500 ring-2 ring-slate-400/20"
+    : i === 2
+    ? "bg-amber-700/10 text-amber-800 ring-2 ring-amber-700/20"
+    : "bg-slate-50 text-slate-400";
 
 export default function TopWaterMeters() {
+  const { data: overview } = useWaterOverview();
+  const ranks = overview?.topConsumers ?? [];
+
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col justify-between h-[220px]">
+    <div className="bg-white/60 backdrop-blur-md border border-slate-300/80 rounded-2xl p-5 shadow-sm flex flex-col h-[420px]">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-        <h3 className="font-bold text-slate-800 text-[11px] tracking-wider uppercase">
-          Top Water Meters
-        </h3>
+      <div className="flex items-center justify-between border-b border-slate-200/70 pb-3">
+        <div className="flex items-center gap-2.5">
+          <div className="h-9 w-9 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100/50">
+            <Droplets className="h-5 w-5 text-blue-500" />
+          </div>
+          <div>
+            <h3 className="font-bold text-slate-800 text-base leading-none">Top Pelanggan Air</h3>
+            <p className="text-[12px] text-slate-400 font-semibold mt-1">Pemakaian {RETENTION_LABEL.toLowerCase()} terakhir</p>
+          </div>
+        </div>
         <a
           href="/water"
-          className="text-[10px] font-bold text-brand-red hover:text-brand-red-hover transition-colors flex items-center gap-0.5"
+          className="text-[12px] font-bold text-brand-red hover:text-brand-red-hover transition-colors flex items-center gap-0.5 flex-shrink-0"
         >
           Lihat Semua <ChevronRight className="h-3 w-3" />
         </a>
@@ -40,19 +41,19 @@ export default function TopWaterMeters() {
 
       {/* Ranks List */}
       <div className="flex-1 overflow-y-auto space-y-2 py-1.5 mt-2 text-xs pr-1 scrollbar-thin">
-        {ranks.map((item) => (
-          <div key={item.rank} className="flex items-center justify-between">
-            {/* Rank circle & Name */}
-            <div className="flex items-center gap-2 max-w-[70%]">
-              <span className="h-5 w-5 rounded-full bg-brand-red text-white font-extrabold text-[9px] flex items-center justify-center flex-shrink-0">
-                {item.rank}
+        {ranks.map((item, i) => (
+          <div key={item.id} className="flex items-center justify-between p-2.5 rounded-xl bg-white/70 border border-slate-100">
+            <div className="flex items-center gap-2.5 max-w-[70%] min-w-0">
+              <span className={`h-6 w-6 rounded-full font-extrabold text-[12px] flex items-center justify-center flex-shrink-0 ${rankStyle(i)}`}>
+                {i + 1}
               </span>
-              <span className="font-bold text-slate-700 truncate">{item.name}</span>
+              <div className="min-w-0">
+                <span className="font-bold text-slate-700 block truncate leading-tight">{item.name}</span>
+                <span className="text-[11px] font-semibold text-slate-400 block mt-0.5">{item.zone}</span>
+              </div>
             </div>
-
-            {/* Value */}
             <span className="font-extrabold text-slate-900 font-mono text-right flex-shrink-0">
-              {item.value} <span className="text-[9px] text-slate-400 font-sans font-semibold">m³</span>
+              {item.usage} <span className="text-[11px] text-slate-400 font-sans font-semibold">m³</span>
             </span>
           </div>
         ))}
@@ -60,4 +61,3 @@ export default function TopWaterMeters() {
     </div>
   );
 }
-
