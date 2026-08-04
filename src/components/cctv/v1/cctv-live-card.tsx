@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   Video, Radar, Volume2, VolumeX, ShieldAlert,
   UserCheck, Maximize2, Users, VideoOff, LoaderCircle,
 } from "lucide-react";
 import { cams, DETECTED_LABEL } from "@/config/cctv";
+import logoCctv from "@/images/logocctv.png";
 import { useCctvCameras } from "@/hooks/use-cctv-cameras";
 import CctvModalPlayer from "./cctv-modal-player";
 import CctvStreamPlayer, { type PlayerStatus } from "../shared/cctv-stream-player";
@@ -82,7 +84,18 @@ function NvrLiveCard({ defaultId }: { defaultId?: string }) {
               }`}
             />
           </span>
-          <span className="text-[15px] font-bold text-white uppercase tracking-wide truncate">
+
+          {/* Logo menggantikan nama kamera di header. Namanya tidak hilang —
+              dropdown tepat di sebelah kanan sudah menampilkannya, jadi menulisnya
+              dua kali hanya menyita lebar. Teks di bawah tetap ada untuk pembaca
+              layar dan pengujian otomatis. */}
+          <Image
+            src={logoCctv}
+            alt="eazycam"
+            priority
+            className="h-[22px] w-auto object-contain flex-shrink-0"
+          />
+          <span className="sr-only">
             {activeCam?.name ?? (isLoading ? "Memuat kamera…" : "Kamera NVR")}
           </span>
         </h3>

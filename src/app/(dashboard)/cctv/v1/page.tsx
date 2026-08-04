@@ -8,7 +8,6 @@ import CctvPeopleCrowdCard from "@/components/cctv/v1/cctv-people-crowd-card";
 import CctvSnapshotEvidenceCard from "@/components/cctv/v1/cctv-snapshot-evidence-card";
 import DesignSwitcher from "@/components/cctv/design-switcher";
 import Section from "@/components/layout/section";
-import { AI_MODELS } from "@/config/cctv";
 
 /**
  * CCTV & AI — varian tampilan 1.
@@ -43,7 +42,7 @@ export default function CctvV1Page() {
         <Section
           num={1}
           title="People Counting"
-          subtitle={`Hitung orang masuk & keluar · ${AI_MODELS.people.model}`}
+          subtitle="Pantau orang masuk & keluar"
         >
           <div className="flex flex-col gap-4">
             <CctvLiveCard defaultCamId="1" modeType="crowd" nvr nvrDefaultId="visitor" />
@@ -56,8 +55,8 @@ export default function CctvV1Page() {
 
         <Section
           num={2}
-          title="People Crowded & Heatmap"
-          subtitle={`Kepadatan antrean & titik pijak pengunjung · ${AI_MODELS.crowd.model} · ${AI_MODELS.heatmap.model}`}
+          title="Crowd Detection"
+          subtitle="Kepadatan antrean & sebaran pengunjung"
         >
           <div className="flex flex-col gap-4">
             <CctvLiveCard defaultCamId="1" modeType="crowd" nvr nvrDefaultId="antrian" />

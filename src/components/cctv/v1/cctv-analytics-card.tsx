@@ -99,7 +99,14 @@ export default function CctvAnalyticsCard({
           </span>
 
           <div className="min-w-0">
-            <h4 className="truncate text-[13px] font-black text-slate-800 uppercase tracking-wider">
+            {/* `title` supaya judul panjang yang terpotong tetap bisa dibaca
+                dengan menghover. Header dipatok 44px agar keempat kartu sejajar,
+                jadi memanjangkannya bukan pilihan — "SCREENSHOT PEOPLE COUNTING"
+                memang tidak muat di kartu selebar ±260px. */}
+            <h4
+              title={title}
+              className="truncate text-[13px] font-black text-slate-800 uppercase tracking-wider"
+            >
               {title}
             </h4>
             {subtitle && (

@@ -1,29 +1,17 @@
 import React from "react";
 
+/**
+ * Bilah dasar halaman — sengaja kosong.
+ *
+ * Teksnya (copyright, "Data Center Indonesia", tautan kebijakan) dihapus atas
+ * permintaan pemakai. Elemennya sendiri dipertahankan sebagai penutup putih
+ * polos: area isi di atasnya bisa di-scroll, dan garis tipis ini yang menandai
+ * di mana halaman berakhir — tanpa itu baris terakhir kartu terlihat seperti
+ * terpotong tepi layar.
+ *
+ * Kalau tingginya mau direbut balik untuk isi, hapus <Footer /> dari
+ * app/(dashboard)/layout.tsx — komponen ini tidak menyimpan keadaan apa pun.
+ */
 export default function Footer() {
-  return (
-    <footer className="flex-shrink-0 bg-white border-t border-slate-200 px-8 py-3.5 flex flex-col md:flex-row items-center justify-between gap-3">
-      {/* Copyright */}
-      <span className="text-[13px] font-medium text-slate-400">
-        &copy; 2026 <span className="font-bold text-slate-600">Merah Putih IoT Platform</span>
-        <span className="hidden md:inline"> · Edited by </span>
-        <span className="hidden md:inline font-bold text-brand-red">PT Telkom Indonesia</span>
-      </span>
-
-      {/* Center: sovereignty */}
-      <div className="flex items-center gap-2 text-[13px] font-semibold text-slate-500">
-        <span className="text-sm leading-none">🇮🇩</span>
-        Data Center Indonesia
-        <span className="h-3 w-px bg-slate-200" aria-hidden />
-        <span className="text-slate-400 font-medium">Powered by Sovereign Cloud Indonesia</span>
-      </div>
-
-      {/* Links */}
-      <div className="flex items-center gap-4 text-[13px] font-medium text-slate-400">
-        <a href="#" className="hover:text-brand-red transition-colors">Kebijakan Privasi</a>
-        <span className="h-3 w-px bg-slate-200" aria-hidden />
-        <a href="#" className="hover:text-brand-red transition-colors">Syarat &amp; Ketentuan</a>
-      </div>
-    </footer>
-  );
+  return <footer className="flex-shrink-0 bg-white border-t border-slate-200 h-9" />;
 }

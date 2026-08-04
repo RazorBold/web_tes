@@ -36,7 +36,7 @@ export default function CctvPeopleCrowdCard() {
 
   return (
     <CctvAnalyticsCard
-      title="People Crowded"
+      title="Crowd Detection"
       subtitle="Kepadatan zona antrean"
       Icon={UsersRound}
       accent="emerald"
@@ -92,7 +92,7 @@ export default function CctvPeopleCrowdCard() {
           className={`flex items-center justify-center gap-1.5 ${CARD_TEXT.note} text-center flex-shrink-0 border-t border-slate-100 pt-2`}
         >
           <Info className="h-3 w-3 flex-shrink-0" />
-          *Berapa kali kepadatan itu terpantau, bukan jumlah orang
+          Menunjukkan frekuensi kepadatan terpantau, bukan jumlah orang
         </p>
       </div>
 

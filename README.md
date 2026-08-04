@@ -357,6 +357,7 @@ Hal-hal yang tidak terbaca dari kode dan sudah pernah menyita waktu:
 
 | Dokumen | Isi |
 |---------|-----|
+| [`alur.md`](alur.md) | **Runbook deploy di VM baru** — paket, database, PM2, port, verifikasi, jebakan |
 | [`docs/API.md`](docs/API.md) | Kontrak REST + MQTT + auth |
 | [`public/openapi.json`](public/openapi.json) | Spesifikasi OpenAPI 3.1, di-render di `/api-docs` |
 | [`PRD_Frontend_SuperWeb_IoT_v1.0.md`](PRD_Frontend_SuperWeb_IoT_v1.0.md) | PRD: desain, RBAC, milestone |

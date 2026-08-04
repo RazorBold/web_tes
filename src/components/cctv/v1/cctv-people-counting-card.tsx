@@ -77,7 +77,7 @@ export default function CctvPeopleCountingCard() {
   return (
     <CctvAnalyticsCard
       title="People Counting"
-      subtitle="Masuk & keluar hari ini"
+      subtitle="Lalu lintas orang hari ini"
       Icon={Users}
       accent="emerald"
       badgeLabel="NVR"
@@ -90,7 +90,7 @@ export default function CctvPeopleCountingCard() {
             title="Buka panel pemantauan"
             className={`${CARD_TEXT.section} hover:text-brand-red underline decoration-dotted underline-offset-4 cursor-pointer transition-colors`}
           >
-            Orang hari ini
+            Total orang hari ini
           </button>
           <span className="flex items-baseline gap-1.5 flex-shrink-0">
             <span className="text-[20px] font-black font-mono leading-none text-slate-700">

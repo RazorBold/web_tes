@@ -1,4 +1,5 @@
 import React from "react";
+import { Toaster } from "sonner";
 import Sidebar from "@/components/layout/sidebar";
 import Topbar from "@/components/layout/topbar";
 import Footer from "@/components/layout/footer";
@@ -32,6 +33,10 @@ export default function DashboardLayout({
 
       {/* Floating AI Assistant */}
       <AiAssistant />
+
+      {/* Notifikasi ringkas. Ditaruh di kiri-bawah, bukan kanan-bawah, supaya
+          tidak tertimpa tombol asisten AI yang mengambang di pojok kanan. */}
+      <Toaster position="bottom-left" richColors closeButton duration={5000} />
     </div>
   );
 }

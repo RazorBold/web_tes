@@ -87,10 +87,10 @@ interface NvrCamera {
  * dan dua koneksi wsai untuk pemandangan yang sama persis.
  */
 export const NVR_CAMERAS: Record<string, NvrCamera> = {
-  visitor: { guid: "acd19678a2069693aec0", name: "Kamera 1 — Visitor Counting", mode: "counting" },
+  visitor: { guid: "acd19678a2069693aec0", name: "Kamera 1 — Booth Kamera 1", mode: "counting" },
   antrian: {
     guid: "acd19678a2049693611e",
-    name: "Kamera 2 — Antrian dan Heatmap",
+    name: "Kamera 2 — Booth Kamera 2",
     mode: "queue",
   },
   heatmap: {

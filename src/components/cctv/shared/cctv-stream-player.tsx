@@ -4,6 +4,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { Radar, Users, VideoOff, LoaderCircle } from "lucide-react";
 import { DEFAULT_STREAM_PROFILE } from "@/config/cctv-stream";
 import { useCctvEvents } from "@/hooks/use-cctv-events";
+import { useCctvCameras } from "@/hooks/use-cctv-cameras";
+// Dipakai bersama lewat React Query: kartu Crowd Detection sudah menariknya,
+// jadi pemutar ini menumpang cache yang sama — bukan permintaan tambahan.
+import { useCctvQueue } from "@/hooks/use-cctv-queue";
 import CctvAiOverlay from "./cctv-ai-overlay";
 
 // mpegts.js dimuat dari /public, bukan dari npm: stream NVR berisi HEVC/H.265 di
@@ -82,6 +86,7 @@ export default function CctvStreamPlayer({
   const [willRetry, setWillRetry] = useState(true);
 
   const ai = useCctvEvents(cameraId);
+  const { data: cameras } = useCctvCameras();
 
   // Seluruh siklus hidup pemutar ada di satu efek, dan SEMUA perubahan state
   // datang dari callback mpegts.js — bukan dari badan efek. Selain itulah yang
@@ -214,7 +219,37 @@ export default function CctvStreamPlayer({
   // ternyata pengukurannya — kanalnya kelaparan karena koneksi wsai dibuka
   // berbarengan dengan kamera lain (lihat OPEN_STAGGER_MS di cctv-ai-socket.ts).
   // Setelah dijeda, kanal itu mengirim 570 kotak dalam 45 detik.
-  const people = ai.boxes.length;
+  // Kamera zona antrean menghitung ISI SEBUAH AREA, bukan objek yang lewat —
+  // dan sumbernya pun berbeda.
+  const zonaAntrean = cameras?.find((c) => c.id === cameraId)?.mode === "queue";
+
+  /**
+   * Angka untuk kamera zona diambil dari SAMPEL ANTREAN, bukan dari kotak wsai.
+   *
+   * Kotak wsai menghitung semua orang di dalam frame, termasuk yang berada di
+   * LUAR zona — terlihat jelas saat diuji: overlay menampilkan 4 orang padahal
+   * sampel zona pada saat yang sama mencatat 2, karena dua orang lainnya berdiri
+   * di luar garis putus-putus. Label "Area Terdeteksi" di atas angka 4 itu
+   * keliru; yang benar isi areanya, dan itu yang dihitung NVR di sampelnya.
+   *
+   * Konsekuensinya angka ini TIDAK real-time: sampel baru masuk tiap ±30 detik.
+   * Karena itu jam sampelnya ikut ditulis — angka yang tertinggal tidak apa-apa,
+   * angka tertinggal yang menyamar sebagai angka detik ini yang bermasalah.
+   */
+  const { data: antrean } = useCctvQueue();
+
+  const people = zonaAntrean ? antrean?.currentPeople ?? null : ai.boxes.length;
+  const labelHitungan = zonaAntrean ? "Area Terdeteksi" : "Objek Terdeteksi";
+  const jamSampel =
+    zonaAntrean && antrean?.lastSampleAt
+      ? new Date(antrean.lastSampleAt).toLocaleTimeString("id-ID", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : null;
+  // Kamera zona tidak lagi bergantung pada koneksi wsai untuk angkanya; yang
+  // lain masih, karena di sana angkanya memang berasal dari sana.
+  const tampilkanHitungan = zonaAntrean ? people != null : ai.status === "open";
 
   return (
     <div className={`relative w-full aspect-video bg-slate-950 overflow-hidden ${className}`}>
@@ -253,14 +288,15 @@ export default function CctvStreamPlayer({
       {/* Jumlah objek terdeteksi — dari wsai, bukan angka tetap. Sengaja hanya
           muncul saat WS benar-benar terhubung, supaya "0" tidak terbaca sebagai
           "sepi" padahal sebetulnya anotasinya belum tersambung. */}
-      {ai.status === "open" && (
+      {tampilkanHitungan && (
         <div className="absolute bottom-3 left-3 pointer-events-none">
           <div className="flex items-center gap-2">
             <Users className="h-5 w-5 text-white/80" />
             <span className="text-[26px] font-bold font-mono text-white leading-none">{people}</span>
           </div>
           <span className="block text-[13px] font-semibold text-white/70 mt-1 leading-none">
-            Objek Terdeteksi
+            {labelHitungan}
+            {jamSampel && <span className="text-white/45"> · {jamSampel}</span>}
           </span>
         </div>
       )}

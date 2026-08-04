@@ -1,8 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { Search, Bell, ChevronDown, User, AlertTriangle, Info, ChevronRight } from "lucide-react";
 import { useAlerts } from "@/hooks/use-alerts";
+import FullscreenButton from "@/components/layout/fullscreen-button";
+import RestartServiceButton from "@/components/layout/restart-service-button";
+import logoNavbar from "@/images/logonavbar.png";
 import type { Alert } from "@/types/alert";
 
 const sevBadge = (severity: Alert["severity"]) =>
@@ -25,17 +29,28 @@ export default function Topbar() {
 
   return (
     <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between gap-6 px-8 sticky top-0 z-40">
-      {/* Brand title */}
-      <div className="min-w-0">
-        <h2 className="text-xl font-extrabold text-slate-800 tracking-tight leading-tight truncate">
-          Merah Putih <span className="text-brand-red">IoT</span> Platform
-        </h2>
-        <p className="text-[14px] text-slate-400 font-medium truncate">
-          Smart Monitoring for a Smarter Indonesia
-        </p>
-        <p className="text-[12px] text-slate-300 font-semibold truncate hidden lg:block">
-          Edited by <span className="text-brand-red">PT Telkom Indonesia</span>
-        </p>
+      {/* Brand — logo Antares eazy lalu judul, dipisah garis tipis */}
+      <div className="flex items-center gap-4 min-w-0">
+        {/* Impor statis, bukan path /public: Next jadi tahu dimensi aslinya dan
+            menyiapkan srcset sendiri. `h-11 w-auto` menjaga rasio logo apa pun
+            nanti berkasnya diganti. */}
+        <Image
+          src={logoNavbar}
+          alt="Antares eazy"
+          priority
+          className="h-11 w-auto object-contain flex-shrink-0"
+        />
+
+        <span className="h-10 w-px bg-slate-200 flex-shrink-0 hidden sm:block" />
+
+        <div className="min-w-0">
+          <h2 className="text-xl font-extrabold text-slate-800 tracking-tight leading-tight truncate">
+            IoT <span className="text-brand-red">Merah Putih</span>
+          </h2>
+          <p className="text-[14px] text-slate-400 font-medium truncate">
+            Smart Monitoring for a Smarter Indonesia
+          </p>
+        </div>
       </div>
 
       {/* Right Area */}
@@ -51,6 +66,11 @@ export default function Topbar() {
             className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-full text-[14px] bg-slate-50/70 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red transition-all placeholder-slate-400 text-slate-700"
           />
         </div>
+
+        {/* Perawatan & layar penuh — ditaruh sebelum notifikasi supaya tidak
+            menyela panel dropdown-nya yang muncul tepat di bawah lonceng. */}
+        <RestartServiceButton />
+        <FullscreenButton />
 
         {/* Notification */}
         <div className="relative">

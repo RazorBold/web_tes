@@ -99,7 +99,7 @@ export default function CctvVisitorEvidenceCard() {
   return (
     <>
       <CctvAnalyticsCard
-        title="Bukti Lintasan"
+        title="Screenshot People Counting"
         subtitle="Tangkapan tiap orang melintas"
         Icon={Camera}
         accent="purple"

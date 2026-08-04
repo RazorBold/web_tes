@@ -98,8 +98,8 @@ export default function CctvSnapshotEvidenceCard() {
   return (
     <>
       <CctvAnalyticsCard
-        title="Heatmap"
-        subtitle="Titik pijak pengunjung"
+        title="Screenshot Heatmap"
+        subtitle="Sebaran kepadatan pengunjung"
         Icon={Flame}
         accent="orange"
         badgeLabel="NVR"
